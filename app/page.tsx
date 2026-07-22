@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { GitHubLink } from "@/components/GitHubLink";
 
 export default function Home() {
   const [noticeVisible, setNoticeVisible] = useState(true);
@@ -31,7 +32,10 @@ export default function Home() {
           {/* <a className="nav-active" href="#eventos">Mis eventos</a>
           <a href="#notificaciones">Notificaciones <b>2</b></a> */}
         </div>
-        <a className="landing-login" href="/login" onClick={enter}>Entrar →</a>
+        <div className="landing-actions">
+          <GitHubLink />
+          <a className="landing-login" href="/login" onClick={enter}>Entrar →</a>
+        </div>
       </nav>
 
       <section className="hero" id="top">

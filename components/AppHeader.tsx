@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { SessionUser } from "@/lib/types";
+import { GitHubLink } from "./GitHubLink";
 
 export function AppHeader({ user, unread = 0 }: { user?: SessionUser | null; unread?: number }) {
   const router = useRouter();
@@ -32,12 +33,15 @@ export function AppHeader({ user, unread = 0 }: { user?: SessionUser | null; unr
           </>
         )}
       </nav>
-      {user && (
-        <div className="account-menu">
-          <span className="avatar">{user.name.slice(0, 2).toUpperCase()}</span>
-          <button onClick={logout}>Salir</button>
-        </div>
-      )}
+      <div className="appbar-actions">
+        <GitHubLink />
+        {user && (
+          <div className="account-menu">
+            <span className="avatar">{user.name.slice(0, 2).toUpperCase()}</span>
+            <button onClick={logout}>Salir</button>
+          </div>
+        )}
+      </div>
     </header>
   );
 }
