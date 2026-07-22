@@ -90,7 +90,7 @@ export function PublicEventClient({ slug }: { slug: string }) {
 
         {error && <p className="form-error public-error" role="alert">{error}</p>}
         <button className="button button-blue send-answer" disabled={sending}>{sending ? "Enviando…" : "Enviar mi respuesta ★"}</button>
-        <p className="privacy-note">La respuesta solo la verá quien te envió este evento.</p>
+        <p className="privacy-note mt-5">La respuesta solo la verá quien te envió este evento.</p>
       </form>
     </PublicFrame>
   );
