@@ -15,8 +15,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ismola.ismola-extension-pack",
-				"openai.chatgpt"
+				"ismola.ismola-extension-pack"
 			]
 		}
 	}

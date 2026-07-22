@@ -67,7 +67,7 @@ export function PublicEventClient({ slug }: { slug: string }) {
   return (
     <PublicFrame>
       <form className={`invitation accent-${event.accent}`} onSubmit={submit}>
-        {event.coverImage && <img className="invitation-cover" src={event.coverImage} alt="Portada de la invitación" referrerPolicy="no-referrer" />}
+        {event.coverImage && <div className="invitation-cover-frame"><img className="invitation-cover" src={event.coverImage} alt="Portada de la invitación" referrerPolicy="no-referrer" /></div>}
         <header className="invitation-hero">
           <span className="big-heart">♥</span>
           <p className="eyebrow">UNA INVITACIÓN PARA {event.recipientName.toUpperCase()}</p>
