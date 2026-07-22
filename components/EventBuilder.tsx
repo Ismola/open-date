@@ -184,7 +184,7 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
           <aside className="live-preview">
             <div className="preview-label"><span>●</span> VISTA PREVIA</div>
             <div className={`phone-preview accent-${accent}`}>
-              {coverImage && <img className="preview-cover" src={coverImage} alt="" referrerPolicy="no-referrer" />}
+              {coverImage && <div className="preview-cover-frame"><img className="preview-cover-image" src={coverImage} alt="" referrerPolicy="no-referrer" /></div>}
               <span className="preview-heart">♥</span>
               <p>PARA {recipientName.toUpperCase() || "ALGUIEN ESPECIAL"}</p>
               <h2>{title || "Tu pregunta aquí"}</h2>
