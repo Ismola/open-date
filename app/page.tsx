@@ -28,8 +28,8 @@ export default function Home() {
           OPEN <span>DATE</span><i>♥</i>
         </a>
         <div className="nav-links">
-          <a className="nav-active" href="#eventos">Mis eventos</a>
-          <a href="#notificaciones">Notificaciones <b>2</b></a>
+          {/* <a className="nav-active" href="#eventos">Mis eventos</a>
+          <a href="#notificaciones">Notificaciones <b>2</b></a> */}
         </div>
         <a className="landing-login" href="/login" onClick={enter}>Entrar →</a>
       </nav>
