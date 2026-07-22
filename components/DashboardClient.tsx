@@ -11,7 +11,13 @@ type DashboardEvent = {
   recipientName: string;
   status: string;
   openCount: number;
-  responses?: Array<{ createdAt: string }>;
+  responses?: EventResponse[];
+  createdAt: string;
+};
+
+type EventResponse = {
+  recipientName: string;
+  answers: Array<{ blockId: string; label: string; value: string }>;
   createdAt: string;
 };
 
@@ -29,6 +35,7 @@ export function DashboardClient({ user }: { user: SessionUser }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState("");
+  const [responsesEvent, setResponsesEvent] = useState<DashboardEvent | null>(null);
 
   useEffect(() => {
     Promise.all([fetch("/api/events"), fetch("/api/notifications")])
@@ -104,6 +111,7 @@ export function DashboardClient({ user }: { user: SessionUser }) {
                   <div className="event-counts"><span><b>{event.openCount ?? 0}</b> aperturas</span><span><b>{event.responses?.length ?? 0}</b> respuestas</span></div>
                   <div className="event-actions">
                     <button onClick={() => copyLink(event.slug)}>{copied === event.slug ? "Copiado ✓" : "Copiar enlace"}</button>
+                    <button onClick={() => setResponsesEvent(event)} disabled={!event.responses?.length}>Ver respuestas</button>
                     <a href={`/events/${event.id}/edit`}>Editar</a>
                     <button className="danger-link" onClick={() => removeEvent(event.id)}>Eliminar</button>
                   </div>
@@ -125,6 +133,23 @@ export function DashboardClient({ user }: { user: SessionUser }) {
           ))}
         </aside>
       </div>
+      {responsesEvent && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="responses-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setResponsesEvent(null); }}>
+          <section className="responses-modal">
+            <button className="modal-close" onClick={() => setResponsesEvent(null)} aria-label="Cerrar">×</button>
+            <p className="eyebrow">RESPUESTAS RECIBIDAS</p>
+            <h2 id="responses-title">{responsesEvent.title}</h2>
+            <div className="responses-list">
+              {responsesEvent.responses?.map((response, index) => (
+                <article className="response-card" key={`${response.createdAt}-${index}`}>
+                  <header><strong>{response.recipientName}</strong><time>{new Date(response.createdAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}</time></header>
+                  {response.answers.length ? response.answers.map((answer) => <div className="response-answer" key={`${answer.blockId}-${answer.label}`}><span>{answer.label}</span><b>{answer.value}</b></div>) : <p className="quiet">No dejó respuestas.</p>}
+                </article>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

@@ -15,7 +15,7 @@ export async function GET() {
     .collection("events")
     .find({ ownerId: new ObjectId(user.id) })
     .sort({ createdAt: -1 })
-    .project({ responses: { $slice: -1 } })
+    .project({ title: 1, slug: 1, recipientName: 1, status: 1, openCount: 1, responses: 1, createdAt: 1 })
     .toArray();
   return NextResponse.json({
     events: events.map((event) => ({ ...event, id: event._id.toString(), _id: undefined })),

@@ -38,7 +38,6 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
   const [slug, setSlug] = useState("cena-conmigo");
   const [slugTouched, setSlugTouched] = useState(false);
   const [recipientName, setRecipientName] = useState("Lucía");
-  const [recipientEmail, setRecipientEmail] = useState("");
   const [intro, setIntro] = useState("He preparado algo especial. Solo necesitas elegir sabiamente.");
   const [scheduledFor, setScheduledFor] = useState("");
   const [coverImage, setCoverImage] = useState("");
@@ -61,7 +60,6 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
         setTitle(event.title);
         setSlug(event.slug);
         setRecipientName(event.recipientName);
-        setRecipientEmail(event.recipientEmail ?? "");
         setIntro(event.intro ?? "");
         setScheduledFor(event.scheduledFor ?? "");
         setCoverImage(event.coverImage ?? "");
@@ -115,7 +113,7 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
     event.preventDefault();
     setError("");
     setSaving(true);
-    const payload = { title, slug, recipientName, recipientEmail, intro, scheduledFor, coverImage, accent, status, blocks };
+    const payload = { title, slug, recipientName, intro, scheduledFor, coverImage, accent, status, blocks };
     const response = await fetch(eventId ? `/api/events/${eventId}` : "/api/events", {
       method: eventId ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -150,7 +148,6 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
               <div className="field-grid">
                 <label className="field-wide">Título<input value={title} onChange={(event) => onTitle(event.target.value)} required /></label>
                 <label>Para<input value={recipientName} onChange={(event) => setRecipientName(event.target.value)} required /></label>
-                <label>Correo del destinatario <small>(opcional)</small><input type="email" value={recipientEmail} onChange={(event) => setRecipientEmail(event.target.value)} /></label>
                 <label className="field-wide">Introducción<textarea value={intro} onChange={(event) => setIntro(event.target.value)} rows={3} /></label>
                 <label>Fecha del plan<input type="datetime-local" value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} /></label>
                 <label>Color protagonista<select value={accent} onChange={(event) => setAccent(event.target.value as typeof accent)}><option value="pink">Rosa pop</option><option value="blue">Azul eléctrico</option><option value="yellow">Amarillo</option><option value="mint">Menta</option></select></label>

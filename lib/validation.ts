@@ -22,7 +22,6 @@ export const eventSchema = z.object({
   title: z.string().trim().min(3).max(140),
   slug,
   recipientName: z.string().trim().min(1).max(80),
-  recipientEmail: z.string().trim().email().optional().or(z.literal("")),
   intro: z.string().trim().max(1200).default(""),
   scheduledFor: z.string().optional().default(""),
   coverImage: z.string().max(1000).optional().default(""),

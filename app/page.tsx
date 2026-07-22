@@ -15,6 +15,12 @@ export default function Home() {
     setYesScale((current) => Math.min(current + 0.08, 1.4));
   }
 
+  async function enter(event: React.MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    const response = await fetch("/api/auth/me");
+    window.location.href = response.ok ? "/dashboard" : "/login";
+  }
+
   return (
     <main className="landing-shell">
       <nav className="topbar" aria-label="Navegación principal">
@@ -25,7 +31,7 @@ export default function Home() {
           <a className="nav-active" href="#eventos">Mis eventos</a>
           <a href="#notificaciones">Notificaciones <b>2</b></a>
         </div>
-        <a className="landing-login" href="/login">Entrar →</a>
+        <a className="landing-login" href="/login" onClick={enter}>Entrar →</a>
       </nav>
 
       <section className="hero" id="top">

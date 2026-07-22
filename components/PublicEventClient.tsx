@@ -124,7 +124,10 @@ function TrickOptions({ options, desired, trick, value, onChange }: { options: s
       return;
     }
     if (trick === "runaway") {
-      const positions = [{ x: 68, y: -28 }, { x: -70, y: 34 }, { x: 54, y: 39 }, { x: -55, y: -35 }];
+      const compact = window.matchMedia("(max-width: 700px)").matches;
+      const positions = compact
+        ? [{ x: 95, y: -70 }, { x: -100, y: 78 }, { x: 90, y: 85 }, { x: -92, y: -82 }]
+        : [{ x: 175, y: -65 }, { x: -180, y: 75 }, { x: 165, y: 88 }, { x: -170, y: -82 }];
       setOffset(positions[dodgeStep.current % positions.length]);
       dodgeStep.current += 1;
     }
