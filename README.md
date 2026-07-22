@@ -1,4 +1,7 @@
-# Open Date
+# [Open Date](https://open-date.ismola.dev/events/new)
+
+<img width="3430" height="3114" alt="open-date ismola dev_" src="https://github.com/user-attachments/assets/6fcd36dc-813a-4002-a021-19780c1053e6" />
+
 
 Open Date es una aplicación Next.js para crear invitaciones y eventos interactivos. Cada usuario puede preparar un enlace personalizado para una persona, combinar textos, preguntas, fechas, fotos y regalos, y configurar respuestas “inevitables” con botones que huyen, desaparecen, se intercambian o hacen crecer la opción deseada.
 
