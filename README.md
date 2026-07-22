@@ -1,45 +1,69 @@
-# Starter Repository
+# Open Date
 
-Este repositorio es una base para arrancar proyectos nuevos con una configuracion lista para desarrollo en contenedor y despliegue de imagenes Docker.
+Open Date es una aplicación Next.js para crear invitaciones y eventos interactivos. Cada usuario puede preparar un enlace personalizado para una persona, combinar textos, preguntas, fechas, fotos y regalos, y configurar respuestas “inevitables” con botones que huyen, desaparecen, se intercambian o hacen crecer la opción deseada.
 
-Incluye:
+## Funciones incluidas
 
-- Devcontainer generico con Docker-in-Docker (DinD).
-- Workflow de Docker publish que sube imagenes automaticamente a GHCR.
-- Ejemplos de `docker-compose` y `Dockerfile` para iniciar rapido.
+- Registro e inicio de sesión con cookies seguras y contraseñas cifradas.
+- Eventos privados por usuario con enlace público y `slug` personalizable.
+- Bloques configurables: texto, pregunta abierta, Sí/No, opciones, fecha, foto y regalo.
+- Cinco comportamientos de respuesta: normal, botón que huye, desaparece, hace crecer la respuesta correcta o intercambia posiciones.
+- Subida y almacenamiento persistente de imágenes.
+- Notificaciones al creador cuando la invitación se abre y cuando se responde.
+- Panel de actividad con aperturas, respuestas, edición, enlace compartible y eliminación.
+- Administración protegida en servidor para correos del dominio configurado, por defecto `@ismola.dev`.
+- Gestión administrativa de usuarios y eventos, incluida activación, moderación y eliminación.
+- Diseño responsive Neo-brutal Pop y controles utilizables con teclado y pantalla táctil.
 
-La idea es usar este repo como punto de partida: agregas tu stack (Node, Python, etc.), montas tus servicios de apoyo con Docker, y dejas que el pipeline publique la imagen de tu app.
+## Arranque con Docker Compose
 
-## Que trae este starter
+El proyecto incluye valores locales por defecto, así que puede arrancar directamente:
 
-- Devcontainer: [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)
- 	- Base Debian Bullseye.
- 	- Feature de Docker-in-Docker habilitada.
- 	- Preparado para ejecutar `docker` dentro del entorno de desarrollo.
-- Deploy workflow: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
- 	- Ejecuta en push a `main`.
- 	- Llama al workflow de publish.
-- Docker publish workflow: [`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)
- 	- Construye y publica imagen multi-arquitectura (`amd64`, `arm64`) en `ghcr.io/<owner>/<repo>`.
+```bash
+docker compose up --build
+```
 
-## Archivos de ejemplo
+Después abre `http://localhost:3000`. MongoDB y las imágenes usan volúmenes persistentes.
 
-- Compose de ejemplo: [`samples/docker-compose.yml`](samples/docker-compose.yml)
-- Dockerfile de ejemplo: [`samples/Dockerfile`](samples/Dockerfile)
+Para detenerlo:
 
-Estos archivos son solo referencia. Puedes copiarlos/adaptarlos a:
+```bash
+docker compose down
+```
 
-- `docker-compose.yml` para servicios de apoyo (db, cache, etc.).
-- `Dockerfile` para la aplicacion principal.
+Para eliminar también todos los datos locales:
 
-## Flujo recomendado
+```bash
+docker compose down -v
+```
 
-1. Abre el proyecto en el devcontainer.
-2. Instala el runtime de tu proyecto (Node, Python, etc.).
-3. Levanta servicios auxiliares con Docker (`docker compose up -d`).
-4. Desarrolla tu aplicacion.
-5. Haz push a `main` y el workflow publicara la imagen automaticamente.
+## Variables de entorno
 
-## Nota sobre servicios en desarrollo
+Los mismos valores por defecto existen en el código, en `docker-compose.yml` y en `.env.example`. Antes de publicar, cambia especialmente `AUTH_SECRET` y la contraseña de MongoDB.
 
-Si tu proyecto necesita servicios adicionales (por ejemplo PostgreSQL, Redis, RabbitMQ), la idea de este starter es correrlos tambien con Docker desde el mismo entorno del devcontainer, aparte del servicio principal que estes programando.
+| Variable | Valor local por defecto | Uso |
+| --- | --- | --- |
+| `MONGODB_URI` | Mongo del Compose | Conexión a MongoDB |
+| `MONGODB_DATABASE` | `open_date` | Base de datos |
+| `AUTH_SECRET` | secreto local indicado | Firma de sesiones; cambiar en producción |
+| `SESSION_COOKIE_NAME` | `open_date_session` | Cookie de autenticación |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | URL pública de la aplicación |
+| `ADMIN_EMAIL_DOMAIN` | `ismola.dev` | Dominio que concede administración |
+| `UPLOAD_DIR` | `/app/data/uploads` | Carpeta persistente de imágenes |
+| `MAX_UPLOAD_MB` | `8` | Tamaño máximo por imagen |
+| `PORT` | `3000` | Puerto publicado |
+
+## Administración
+
+Registra una cuenta cuyo correo termine en `@ismola.dev` (o en el dominio definido por `ADMIN_EMAIL_DOMAIN`). Esa cuenta verá la pestaña **Administración**. La API comprueba el dominio de nuevo en el servidor; ocultar o modificar la interfaz no permite saltarse la autorización.
+
+## Desarrollo sin contenedores
+
+Requiere Node.js 22 y una instancia de MongoDB accesible. Ajusta `MONGODB_URI` y ejecuta:
+
+```bash
+npm install
+npm run dev:next
+```
+
+La aplicación estará en `http://localhost:3000`.

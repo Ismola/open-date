@@ -1,17 +1,33 @@
-# Dockerfile de ejemplo para una app Node.js.
-# Si usas Python u otro stack, adapta esta base.
-FROM node:22-alpine
-
+FROM node:22-alpine AS dependencies
 WORKDIR /app
-
-# Copia archivos de dependencias primero para aprovechar cache.
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copia el resto del proyecto.
+FROM node:22-alpine AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
+RUN npm run build:next
 
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    MONGODB_URI=mongodb://mongo:27017/open_date \
+    MONGODB_DATABASE=open_date \
+    AUTH_SECRET=open-date-local-secret-change-in-production \
+    SESSION_COOKIE_NAME=open_date_session \
+    NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+    ADMIN_EMAIL_DOMAIN=ismola.dev \
+    UPLOAD_DIR=/app/data/uploads \
+    MAX_UPLOAD_MB=8
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+RUN mkdir -p /app/data/uploads && chown -R node:node /app
+USER node
 EXPOSE 3000
-
-# Ajusta este comando al script de tu proyecto.
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start:next"]

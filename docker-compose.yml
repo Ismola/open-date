@@ -1,39 +1,43 @@
-version: "3.9"
-
 services:
-  app:
-    # Ajusta el build/contexto a tu proyecto real.
-    build:
-      context: ..
-      dockerfile: samples/Dockerfile
-    image: starter-app:dev
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/app
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - db
-      - redis
-
-  db:
-    image: postgres:16
+  mongo:
+    image: mongo:${MONGO_VERSION:-7.0}
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-open_date}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-open_date_local_password}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--username", "${MONGO_ROOT_USERNAME:-open_date}", "--password", "${MONGO_ROOT_PASSWORD:-open_date_local_password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
-  redis:
-    image: redis:7
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
     ports:
-      - "6379:6379"
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: ${MONGODB_URI:-mongodb://open_date:open_date_local_password@mongo:27017/open_date?authSource=admin}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-open_date}
+      AUTH_SECRET: ${AUTH_SECRET:-open-date-local-secret-change-in-production}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-open_date_session}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      ADMIN_EMAIL_DOMAIN: ${ADMIN_EMAIL_DOMAIN:-ismola.dev}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/app/data/uploads}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-8}
+    volumes:
+      - uploads_data:/app/data/uploads
 
 volumes:
-  postgres-data:
+  mongo_data:
+  uploads_data:
