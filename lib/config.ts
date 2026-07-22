@@ -9,8 +9,15 @@ export const config = {
   adminEmailDomain: (process.env.ADMIN_EMAIL_DOMAIN ?? "ismola.dev")
     .replace(/^@/, "")
     .toLowerCase(),
-  uploadDir: process.env.UPLOAD_DIR ?? "./data/uploads",
   maxUploadMb: Number(process.env.MAX_UPLOAD_MB ?? "8"),
+  s3: {
+    endpoint: process.env.S3_ENDPOINT ?? "",
+    region: process.env.S3_REGION ?? "auto",
+    bucket: process.env.S3_BUCKET ?? "",
+    accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? "",
+    publicUrl: (process.env.S3_PUBLIC_URL ?? "").replace(/\/$/, ""),
+  },
 };
 
 export function isAdminEmail(email: string) {

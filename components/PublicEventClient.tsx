@@ -67,7 +67,7 @@ export function PublicEventClient({ slug }: { slug: string }) {
   return (
     <PublicFrame>
       <form className={`invitation accent-${event.accent}`} onSubmit={submit}>
-        {event.coverImage && <img className="invitation-cover" src={event.coverImage} alt="Portada de la invitación" />}
+        {event.coverImage && <img className="invitation-cover" src={event.coverImage} alt="Portada de la invitación" referrerPolicy="no-referrer" />}
         <header className="invitation-hero">
           <span className="big-heart">♥</span>
           <p className="eyebrow">UNA INVITACIÓN PARA {event.recipientName.toUpperCase()}</p>
@@ -102,8 +102,8 @@ function PublicFrame({ children }: { children: React.ReactNode }) {
 
 function PublicBlock({ block, index, value, onChange }: { block: EventBlock; index: number; value: string; onChange: (value: string) => void }) {
   if (block.type === "message") return <section className="public-message" id={`block-${block.id}`}><span>{String(index + 1).padStart(2, "0")}</span><p>{block.label}</p></section>;
-  if (block.type === "photo") return <section className="public-photo" id={`block-${block.id}`}><p>{block.label}</p>{block.imageUrl && <img src={block.imageUrl} alt={block.label} />}</section>;
-  if (block.type === "gift") return <section className="public-gift" id={`block-${block.id}`}>{block.imageUrl ? <img src={block.imageUrl} alt="" /> : <span>🎁</span>}<div><p>{block.label}</p><h2>{block.giftTitle || "Un regalo para ti"}</h2>{block.linkUrl && <a href={block.linkUrl} target="_blank" rel="noreferrer">Abrir regalo →</a>}</div></section>;
+  if (block.type === "photo") return <section className="public-photo" id={`block-${block.id}`}><p>{block.label}</p>{block.imageUrl && <img src={block.imageUrl} alt={block.label} referrerPolicy="no-referrer" />}</section>;
+  if (block.type === "gift") return <section className="public-gift" id={`block-${block.id}`}>{block.imageUrl ? <img src={block.imageUrl} alt="" referrerPolicy="no-referrer" /> : <span>🎁</span>}<div><p>{block.label}</p><h2>{block.giftTitle || "Un regalo para ti"}</h2>{block.linkUrl && <a href={block.linkUrl} target="_blank" rel="noreferrer">Abrir regalo →</a>}</div></section>;
   if (block.type === "date") return <section className="public-date" id={`block-${block.id}`}><span>📅</span><div><p>{block.label}</p><strong>{block.dateValue ? new Date(block.dateValue).toLocaleString("es-ES", { dateStyle: "full", timeStyle: "short" }) : "La fecha está por decidir"}</strong></div></section>;
   if (block.type === "text_input") return <section className="public-question" id={`block-${block.id}`}><span className="question-number">{index + 1}</span><label>{block.label}{block.required && <b>*</b>}<textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} placeholder="Escribe aquí…" required={block.required} /></label></section>;
   const options = block.type === "yes_no" ? ["Sí", "No"] : block.options ?? [];

@@ -4,6 +4,8 @@ dist
 .git
 .wrangler
 .sites-runtime
+.env*
+!.env.example
 data/uploads
 npm-debug.log*
 README.md

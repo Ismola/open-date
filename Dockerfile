@@ -21,13 +21,12 @@ ENV NODE_ENV=production \
     SESSION_COOKIE_NAME=open_date_session \
     NEXT_PUBLIC_APP_URL=http://localhost:3000 \
     ADMIN_EMAIL_DOMAIN=ismola.dev \
-    UPLOAD_DIR=/app/data/uploads \
     MAX_UPLOAD_MB=8
 COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-RUN mkdir -p /app/data/uploads && chown -R node:node /app
+RUN chown -R node:node /app
 USER node
 EXPOSE 3000
 CMD ["npm", "run", "start:next"]

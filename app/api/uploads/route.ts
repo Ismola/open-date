@@ -1,10 +1,9 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { jsonError } from "@/lib/http";
+import { uploadPublicImage } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
@@ -25,8 +24,7 @@ export async function POST(request: Request) {
   if (file.size > config.maxUploadMb * 1024 * 1024) {
     return jsonError(`La imagen supera el máximo de ${config.maxUploadMb} MB`);
   }
-  const filename = `${randomUUID()}${extension}`;
-  await mkdir(config.uploadDir, { recursive: true });
-  await writeFile(path.join(config.uploadDir, filename), Buffer.from(await file.arrayBuffer()));
-  return NextResponse.json({ url: `/api/uploads/${filename}` }, { status: 201 });
+  const key = `images/${randomUUID()}${extension}`;
+  const url = await uploadPublicImage(key, new Uint8Array(await file.arrayBuffer()), file.type);
+  return NextResponse.json({ url }, { status: 201 });
 }

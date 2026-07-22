@@ -184,7 +184,7 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
           <aside className="live-preview">
             <div className="preview-label"><span>●</span> VISTA PREVIA</div>
             <div className={`phone-preview accent-${accent}`}>
-              {coverImage && <img className="preview-cover" src={coverImage} alt="" />}
+              {coverImage && <img className="preview-cover" src={coverImage} alt="" referrerPolicy="no-referrer" />}
               <span className="preview-heart">♥</span>
               <p>PARA {recipientName.toUpperCase() || "ALGUIEN ESPECIAL"}</p>
               <h2>{title || "Tu pregunta aquí"}</h2>
@@ -203,7 +203,7 @@ export function EventBuilder({ user, eventId }: { user: SessionUser; eventId?: s
 
 function PreviewBlock({ block }: { block: EventBlock }) {
   if (block.type === "message") return <p className="preview-message">{block.label}</p>;
-  if (block.type === "photo" && block.imageUrl) return <img className="preview-photo" src={block.imageUrl} alt="" />;
+  if (block.type === "photo" && block.imageUrl) return <img className="preview-photo" src={block.imageUrl} alt="" referrerPolicy="no-referrer" />;
   if (block.type === "gift") return <div className="preview-gift">🎁 <b>{block.giftTitle || block.label}</b></div>;
   if (block.type === "date") return <div className="preview-date">📅 {block.dateValue ? new Date(block.dateValue).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }) : block.label}</div>;
   if (block.type === "text_input") return <div className="preview-field"><b>{block.label}</b><span>Escribe aquí…</span></div>;

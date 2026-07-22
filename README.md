@@ -23,7 +23,7 @@ El proyecto incluye valores locales por defecto, así que puede arrancar directa
 docker compose up --build
 ```
 
-Después abre `http://localhost:3000`. MongoDB y las imágenes usan volúmenes persistentes.
+Después abre `http://localhost:3000`. MongoDB usa un volumen persistente y las imágenes se guardan en un almacenamiento compatible con S3.
 
 Para detenerlo:
 
@@ -49,8 +49,13 @@ Los mismos valores por defecto existen en el código, en `docker-compose.yml` y 
 | `SESSION_COOKIE_NAME` | `open_date_session` | Cookie de autenticación |
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | URL pública de la aplicación |
 | `ADMIN_EMAIL_DOMAIN` | `ismola.dev` | Dominio que concede administración |
-| `UPLOAD_DIR` | `/app/data/uploads` | Carpeta persistente de imágenes |
 | `MAX_UPLOAD_MB` | `8` | Tamaño máximo por imagen |
+| `S3_ENDPOINT` | — | Endpoint compatible con S3, sin incluir el bucket |
+| `S3_REGION` | `auto` | Región S3 (`auto` para Cloudflare R2) |
+| `S3_BUCKET` | — | Nombre del bucket |
+| `S3_ACCESS_KEY_ID` | — | Access Key ID (solo servidor) |
+| `S3_SECRET_ACCESS_KEY` | — | Secret Access Key (solo servidor) |
+| `S3_PUBLIC_URL` | — | Dominio público desde el que se sirven las imágenes |
 | `PORT` | `3000` | Puerto publicado |
 
 ## Administración
