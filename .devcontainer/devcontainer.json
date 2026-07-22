@@ -6,25 +6,25 @@
 	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
 
 	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:4": {
-			"version": "latest",
-			"enableNonRootDocker": "true",
-			"moby": "true"
-		}
+		"ghcr.io/devcontainers/features/docker-in-docker:4": {},
+		"ghcr.io/devcontainers/features/node:2": {}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ismola.ismola-extension-pack"
+				"ismola.ismola-extension-pack",
+				"bradlc.vscode-tailwindcss",
+				"dsznajder.es7-react-js-snippets",
+				"dbaeumer.vscode-eslint"
 			]
 		}
-	}
+	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "docker --version",
+	"postCreateCommand": "npm ci"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
