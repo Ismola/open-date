@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import type { SessionUser } from "@/lib/types";
 import { AppHeader } from "./AppHeader";
+import { Pagination } from "./Pagination";
+
+const ADMIN_PAGE_SIZE = 10;
 
 type AdminUser = { id: string; name: string; email: string; active: boolean; createdAt: string };
 type AdminEvent = { id: string; title: string; slug: string; recipientName: string; status: string; createdAt: string; openCount: number; responses?: unknown[]; owner?: { name: string; email: string } };
@@ -13,6 +16,8 @@ export function AdminPanel({ user }: { user: SessionUser }) {
   const [events, setEvents] = useState<AdminEvent[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [usersPage, setUsersPage] = useState(1);
+  const [eventsPage, setEventsPage] = useState(1);
 
   async function load() {
     setLoading(true);
@@ -22,6 +27,8 @@ export function AdminPanel({ user }: { user: SessionUser }) {
     ]);
     if (userResponse.ok) setUsers((await userResponse.json()).users);
     if (eventResponse.ok) setEvents((await eventResponse.json()).events);
+    setUsersPage(1);
+    setEventsPage(1);
     setLoading(false);
   }
 
@@ -53,14 +60,27 @@ export function AdminPanel({ user }: { user: SessionUser }) {
   async function deleteEvent(id: string) {
     if (!window.confirm("¿Eliminar definitivamente este evento?")) return;
     const response = await fetch(`/api/admin/events?id=${id}`, { method: "DELETE" });
-    if (response.ok) setEvents((items) => items.filter((item) => item.id !== id));
+    if (response.ok) {
+      const nextEvents = events.filter((item) => item.id !== id);
+      setEvents(nextEvents);
+      setEventsPage((page) => Math.min(page, Math.max(1, Math.ceil(nextEvents.length / ADMIN_PAGE_SIZE))));
+    }
   }
+
+  const visibleUsers = users.slice(
+    (usersPage - 1) * ADMIN_PAGE_SIZE,
+    usersPage * ADMIN_PAGE_SIZE,
+  );
+  const visibleEvents = events.slice(
+    (eventsPage - 1) * ADMIN_PAGE_SIZE,
+    eventsPage * ADMIN_PAGE_SIZE,
+  );
 
   return <main className="app-shell admin-shell"><AppHeader user={user} /><section className="admin-heading"><div><p className="eyebrow">SOLO @ISMOLA.DEV</p><h1>Administración</h1><p>Usuarios, eventos y las llaves del reino.</p></div><div className="admin-total"><b>{users.length}</b><span>usuarios</span><b>{events.length}</b><span>eventos</span></div></section>
     <section className="admin-card">
       <div className="admin-toolbar"><div className="admin-tabs"><button className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}>Usuarios</button><button className={tab === "events" ? "active" : ""} onClick={() => setTab("events")}>Eventos</button></div><form onSubmit={(event) => { event.preventDefault(); load(); }}><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar…" /><button>Buscar</button></form></div>
-      {loading ? <div className="page-loader small-loader">Cargando datos…</div> : tab === "users" ? <div className="admin-table"><div className="table-head"><span>Usuario</span><span>Alta</span><span>Estado</span><span>Acción</span></div>{users.map((target) => <div className="table-row" key={target.id}><span><b>{target.name}</b><small>{target.email}</small></span><span>{new Date(target.createdAt).toLocaleDateString("es-ES")}</span><span><i className={target.active ? "dot-on" : "dot-off"} />{target.active ? "Activo" : "Desactivado"}</span><span><button disabled={target.id === user.id} onClick={() => toggleUser(target)}>{target.active ? "Desactivar" : "Activar"}</button></span></div>)}</div>
-      : <div className="admin-table"><div className="table-head event-table"><span>Evento</span><span>Creador</span><span>Actividad</span><span>Estado</span><span>Acción</span></div>{events.map((item) => <div className="table-row event-table" key={item.id}><span><b>{item.title}</b><small>/date/{item.slug} · para {item.recipientName}</small></span><span><b>{item.owner?.name ?? "—"}</b><small>{item.owner?.email}</small></span><span>{item.openCount ?? 0} aperturas<br />{item.responses?.length ?? 0} respuestas</span><span><select value={item.status} onChange={(event) => setEventStatus(item.id, event.target.value)}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="disabled">Desactivado</option></select></span><span><button className="danger-link" onClick={() => deleteEvent(item.id)}>Eliminar</button></span></div>)}</div>}
+      {loading ? <div className="page-loader small-loader">Cargando datos…</div> : tab === "users" ? <><div className="admin-table"><div className="table-head"><span>Usuario</span><span>Alta</span><span>Estado</span><span>Acción</span></div>{visibleUsers.map((target) => <div className="table-row" key={target.id}><span><b>{target.name}</b><small>{target.email}</small></span><span>{new Date(target.createdAt).toLocaleDateString("es-ES")}</span><span><i className={target.active ? "dot-on" : "dot-off"} />{target.active ? "Activo" : "Desactivado"}</span><span><button disabled={target.id === user.id} onClick={() => toggleUser(target)}>{target.active ? "Desactivar" : "Activar"}</button></span></div>)}</div><Pagination currentPage={usersPage} pageSize={ADMIN_PAGE_SIZE} totalItems={users.length} onPageChange={setUsersPage} label="usuarios" /></>
+      : <><div className="admin-table"><div className="table-head event-table"><span>Evento</span><span>Creador</span><span>Actividad</span><span>Estado</span><span>Acción</span></div>{visibleEvents.map((item) => <div className="table-row event-table" key={item.id}><span><b>{item.title}</b><small>/date/{item.slug} · para {item.recipientName}</small></span><span><b>{item.owner?.name ?? "—"}</b><small>{item.owner?.email}</small></span><span>{item.openCount ?? 0} aperturas<br />{item.responses?.length ?? 0} respuestas</span><span><select value={item.status} onChange={(event) => setEventStatus(item.id, event.target.value)}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="disabled">Desactivado</option></select></span><span><button className="danger-link" onClick={() => deleteEvent(item.id)}>Eliminar</button></span></div>)}</div><Pagination currentPage={eventsPage} pageSize={ADMIN_PAGE_SIZE} totalItems={events.length} onPageChange={setEventsPage} label="eventos de administración" /></>}
     </section>
   </main>;
 }

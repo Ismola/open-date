@@ -3,6 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type { SessionUser } from "@/lib/types";
 import { AppHeader } from "./AppHeader";
+import { Pagination } from "./Pagination";
+
+const EVENTS_PER_PAGE = 6;
+const NOTIFICATIONS_PER_PAGE = 8;
 
 type DashboardEvent = {
   id: string;
@@ -36,6 +40,8 @@ export function DashboardClient({ user }: { user: SessionUser }) {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState("");
   const [responsesEvent, setResponsesEvent] = useState<DashboardEvent | null>(null);
+  const [eventsPage, setEventsPage] = useState(1);
+  const [notificationsPage, setNotificationsPage] = useState(1);
 
   useEffect(() => {
     Promise.all([fetch("/api/events"), fetch("/api/notifications")])
@@ -55,6 +61,14 @@ export function DashboardClient({ user }: { user: SessionUser }) {
     }),
     [events],
   );
+  const visibleEvents = events.slice(
+    (eventsPage - 1) * EVENTS_PER_PAGE,
+    eventsPage * EVENTS_PER_PAGE,
+  );
+  const visibleNotifications = notifications.slice(
+    (notificationsPage - 1) * NOTIFICATIONS_PER_PAGE,
+    notificationsPage * NOTIFICATIONS_PER_PAGE,
+  );
 
   async function copyLink(slug: string) {
     const url = `${window.location.origin}/date/${slug}`;
@@ -66,7 +80,11 @@ export function DashboardClient({ user }: { user: SessionUser }) {
   async function removeEvent(id: string) {
     if (!window.confirm("¿Eliminar este evento y sus notificaciones?")) return;
     const response = await fetch(`/api/events/${id}`, { method: "DELETE" });
-    if (response.ok) setEvents((current) => current.filter((event) => event.id !== id));
+    if (response.ok) {
+      const nextEvents = events.filter((event) => event.id !== id);
+      setEvents(nextEvents);
+      setEventsPage((page) => Math.min(page, Math.max(1, Math.ceil(nextEvents.length / EVENTS_PER_PAGE))));
+    }
   }
 
   async function markRead() {
@@ -100,7 +118,7 @@ export function DashboardClient({ user }: { user: SessionUser }) {
             <div className="empty-card"><span>✦</span><h3>Aquí falta un plan</h3><p>Crea tu primer evento y comparte un enlace único.</p><a href="/events/new">Crear el primero →</a></div>
           ) : (
             <div className="event-list">
-              {events.map((event) => (
+              {visibleEvents.map((event) => (
                 <article className="dashboard-event" key={event.id}>
                   <div className="event-badge">♥</div>
                   <div className="event-main">
@@ -117,6 +135,13 @@ export function DashboardClient({ user }: { user: SessionUser }) {
                   </div>
                 </article>
               ))}
+              <Pagination
+                currentPage={eventsPage}
+                pageSize={EVENTS_PER_PAGE}
+                totalItems={events.length}
+                onPageChange={setEventsPage}
+                label="eventos"
+              />
             </div>
           )}
         </section>
@@ -125,12 +150,23 @@ export function DashboardClient({ user }: { user: SessionUser }) {
           <div className="section-title"><h2>Notificaciones</h2>{unread > 0 && <button onClick={markRead}>Marcar leídas</button>}</div>
           {notifications.length === 0 ? (
             <p className="quiet">Cuando alguien abra o responda a un evento, aparecerá aquí.</p>
-          ) : notifications.map((notification) => (
-            <article className={`notification ${notification.readAt ? "" : "unread"}`} key={notification.id}>
-              <span>{notification.type === "responded" ? "★" : "♥"}</span>
-              <div><strong>{notification.message}</strong><time>{new Date(notification.createdAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}</time></div>
-            </article>
-          ))}
+          ) : (
+            <>
+              {visibleNotifications.map((notification) => (
+                <article className={`notification ${notification.readAt ? "" : "unread"}`} key={notification.id}>
+                  <span>{notification.type === "responded" ? "★" : "♥"}</span>
+                  <div><strong>{notification.message}</strong><time>{new Date(notification.createdAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}</time></div>
+                </article>
+              ))}
+              <Pagination
+                currentPage={notificationsPage}
+                pageSize={NOTIFICATIONS_PER_PAGE}
+                totalItems={notifications.length}
+                onPageChange={setNotificationsPage}
+                label="notificaciones"
+              />
+            </>
+          )}
         </aside>
       </div>
       {responsesEvent && (
