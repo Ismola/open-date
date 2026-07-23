@@ -98,7 +98,7 @@ export function PublicEventClient({ slug }: { slug: string }) {
 }
 
 function PublicFrame({ children }: { children: React.ReactNode }) {
-  return <main className="public-page"><header className="public-header"><Link className="brand" href="/">OPEN <span>DATE</span><i>♥</i></Link><div className="public-header-actions"><GitHubLink /><Link className="public-header-cta" href="/register">Crea el tuyo ＋</Link></div></header>{children}<footer>Hecho con ♥ y un poquito de picardía en Open Date.</footer></main>;
+  return <main className="public-page"><header className="public-header"><Link className="brand" href="/">OPEN <span>DATE</span><i>♥</i></Link><div className="public-header-actions"><GitHubLink /><Link className="public-header-cta" href="/register">Crea el tuyo ＋</Link></div></header>{children}<footer>Hecho con ♥ y un poquito de picardía <a target="_blank" href="https://github.com/Ismola">@ismola</a>.</footer></main>;
 }
 
 function PublicBlock({ block, index, value, onChange }: { block: EventBlock; index: number; value: string; onChange: (value: string) => void }) {
